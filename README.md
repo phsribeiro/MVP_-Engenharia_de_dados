@@ -184,19 +184,19 @@ Leitura e Transformação
 
 from pyspark.sql import functions as F
 
-# Caminho DBFS do CSV copiado
+Caminho DBFS do CSV copiado
 csv_path = "dbfs:/FileStore/eficiencia_hvac.csv"
 
-# Leitura com separador correto
+Leitura com separador correto
 df = spark.read.csv(csv_path, header=True, inferSchema=True, sep=";")
 
-# Conversão da coluna DATA para tipo date
+Conversão da coluna DATA para tipo date
 df = df.withColumn("DATA", F.to_date("DATA", "yyyy-MM-dd"))
 
-# Adicionar coluna mês
+Adicionar coluna mês
 df = df.withColumn("month", F.date_format("DATA", "yyyy-MM"))
 
-# Calcular eficiência energética (kW/TR) para cada chiller
+Calcular eficiência energética (kW/TR) para cada chiller
 df = df.withColumn("EF_CHILLER1", F.round(df["kW_CHILLER1"] / df["TR_CHILLER1"], 2))
 df = df.withColumn("EF_CHILLER2", F.round(df["kW_CHILLER2"] / df["TR_CHILLER2"], 2))
 df = df.withColumn("EF_CHILLER3", F.round(df["kW_CHILLER3"] / df["TR_CHILLER3"], 2))
@@ -207,20 +207,20 @@ Carga de Dados
 
  
 
-# Criação do schema (banco de dados)
+Criação do schema (banco de dados)
 spark.sql("CREATE DATABASE IF NOT EXISTS Banco_de_dados_eficiencia")
 
-# Salvar a tabela transformada
+Salvar a tabela transformada
 df.write.mode("overwrite").format("delta").saveAsTable("Banco_de_dados_eficiencia.Eficiencia_HVAC_Transformada")
 
-# Criar tabela resumo com eficiência média mensal (kW/TR)
+Criar tabela resumo com eficiência média mensal (kW/TR)
 media_kw_tr = df.groupBy("month").agg(
     F.round(F.avg("EF_CHILLER1"), 2).alias("kW_TR_Medio_Chiller1"),
     F.round(F.avg("EF_CHILLER2"), 2).alias("kW_TR_Medio_Chiller2"),
     F.round(F.avg("EF_CHILLER3"), 2).alias("kW_TR_Medio_Chiller3")
 )
 
-# Grava a tabela resumo
+Grava a tabela resumo
 media_kw_tr.write.mode("overwrite").format("delta").saveAsTable("Banco_de_dados
 
  
