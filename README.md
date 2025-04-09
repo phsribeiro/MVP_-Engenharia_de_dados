@@ -17,6 +17,15 @@ ANÁLISE DE PERFORMANCE E EFICIÊNCIA DE CHILLER
 
 
 
+
+
+
+
+
+
+
+
+
 INTRODUÇÃO 
 
 O Brasil está entre os países com a energia elétrica mais cara do mundo, ocupando a sexta posição no ranking global. Segundo um levantamento da Federação das Indústrias do Rio de Janeiro (FIRJAN), realizado em 2018, o custo da energia no país é 46% superior à média internacional. Esse cenário representa um grande desafio para a competitividade da indústria nacional e impõe impactos significativos também ao setor de real estate, especialmente em empreendimentos comerciais de grande porte. 
