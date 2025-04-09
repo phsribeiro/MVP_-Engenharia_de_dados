@@ -14,41 +14,8 @@ ENGENHARIA DE DADOS
 
  
 
- 
-
 PONTÍFICA UNIVERSIDADE CATÓLICA DO RIO DE JANEIRO – PUC RIO  
 
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
 
 ALUNOS:                                     
 
