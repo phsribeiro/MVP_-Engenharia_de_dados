@@ -124,77 +124,15 @@ Foi adotado o modelo flat (Data Lake) com uma única tabela de catálogo de dado
 
  
 
-Coluna 
-
-Tipo 
-
-Descrição 
-
-Valores Esperados 
-
-DATA 
-
-Date 
-
-Data da medição 
-
-01/01/2024 a 31/03/2024 
-
-kW_CHILLER1 
-
-Float 
-
-Consumo de energia do Chiller 1 
-
-0 a 270 
-
-TR_CHILLER1 
-
-Float 
-
-Carga térmica do Chiller 1 
-
-0 a 240 
-
-kW_CHILLER2 
-
-Float 
-
-Consumo de energia do Chiller 2 
-
-0 a 270 
-
-TR_CHILLER2 
-
-Float 
-
-Carga térmica do Chiller 2 
-
-0 a 240 
-
-kW_CHILLER3 
-
-Float 
-
-Consumo de energia do Chiller 3 
-
-0 a 270 
-
-TR_CHILLER3 
-
-Float 
-
-Carga térmica do Chiller 3 
-
-0 a 240 
-
-TEMP_EXTERNA 
-
-Float 
-
-Temperatura ambiente externa 
-
-10 a 38 
+| **Coluna**       | **Tipo** | **Descrição**                             | **Valores Esperados**             |
+|------------------|----------|-------------------------------------------|-----------------------------------|
+| DATA             | Date     | Data da medição                           | 01/01/2024 a 31/03/2024           |
+| kW_CHILLER1      | Float    | Consumo de energia do Chiller 1           | 0 a 270                           |
+| TR_CHILLER1      | Float    | Carga térmica do Chiller 1                | 0 a 240                           |
+| kW_CHILLER2      | Float    | Consumo de energia do Chiller 2           | 0 a 270                           |
+| TR_CHILLER2      | Float    | Carga térmica do Chiller 2                | 0 a 240                           |
+| kW_CHILLER3      | Float    | Consumo de energia do Chiller 3           | 0 a 270                           |
+| TR_CHILLER3      | Float    | Carga térmica do Chiller 3                | 0 a 240                           |
 
  
 
@@ -244,9 +182,24 @@ Leitura e Transformação
 
  
 
-Texto
+from pyspark.sql import functions as F
 
-O conteúdo gerado por IA pode estar incorreto. 
+# Caminho DBFS do CSV copiado
+csv_path = "dbfs:/FileStore/eficiencia_hvac.csv"
+
+# Leitura com separador correto
+df = spark.read.csv(csv_path, header=True, inferSchema=True, sep=";")
+
+# Conversão da coluna DATA para tipo date
+df = df.withColumn("DATA", F.to_date("DATA", "yyyy-MM-dd"))
+
+# Adicionar coluna mês
+df = df.withColumn("month", F.date_format("DATA", "yyyy-MM"))
+
+# Calcular eficiência energética (kW/TR) para cada chiller
+df = df.withColumn("EF_CHILLER1", F.round(df["kW_CHILLER1"] / df["TR_CHILLER1"], 2))
+df = df.withColumn("EF_CHILLER2", F.round(df["kW_CHILLER2"] / df["TR_CHILLER2"], 2))
+df = df.withColumn("EF_CHILLER3", F.round(df["kW_CHILLER3"] / df["TR_CHILLER3"], 2))
 
  
 
@@ -254,21 +207,27 @@ Carga de Dados
 
  
 
-Interface gráfica do usuário, Texto, Aplicativo
+# Criação do schema (banco de dados)
+spark.sql("CREATE DATABASE IF NOT EXISTS Banco_de_dados_eficiencia")
 
-O conteúdo gerado por IA pode estar incorreto. 
+# Salvar a tabela transformada
+df.write.mode("overwrite").format("delta").saveAsTable("Banco_de_dados_eficiencia.Eficiencia_HVAC_Transformada")
+
+# Criar tabela resumo com eficiência média mensal (kW/TR)
+media_kw_tr = df.groupBy("month").agg(
+    F.round(F.avg("EF_CHILLER1"), 2).alias("kW_TR_Medio_Chiller1"),
+    F.round(F.avg("EF_CHILLER2"), 2).alias("kW_TR_Medio_Chiller2"),
+    F.round(F.avg("EF_CHILLER3"), 2).alias("kW_TR_Medio_Chiller3")
+)
+
+# Grava a tabela resumo
+media_kw_tr.write.mode("overwrite").format("delta").saveAsTable("Banco_de_dados
 
  
 
  
 
- 
-
- 
-
- 
-
- 
+  
 
  
 
